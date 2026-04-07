@@ -19,31 +19,28 @@ void encryptMessage(const std::string& plaintext, unsigned char* ciphertext, int
     EVP_CIPHER_CTX* ctx;
     int len;
 
-
-    //const unsigned char* plain_text = (const unsigned char*)plaintext.c_str();
-
     // Call the method from OpenSSL to create and initialize the context. Then call the handleErrors() method
     ctx = EVP_CIPHER_CTX_new();
     if (!ctx) {
-	handleErrors();
+	    handleErrors();
     }
 
     // Call the method from OpenSSL to initialize encryption operation. Then call the handleErrors() method
     int init_encrypt = EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, reinterpret_cast<const unsigned char*>(aes_key.c_str()), iv);
     if (init_encrypt != 1) {
-	handleErrors();
+	    handleErrors();
     }
 
     // Call the method from OpenSSL to encrypt plaintext. Then call the handleErrors() method
-    int encrypt_text = EVP_EncryptUpdate(ctx, ciphertext, ciphertext_len, reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length());
+    int encrypt_text = EVP_EncryptUpdate(ctx, ciphertext, &len, reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length());
     if (encrypt_text != 1) {
-	handleErrors();
+	    handleErrors();
     }
 
     // Call the method from OpenSSL to finalize encryption. Then call the handleErrors() method
     int encrypt_final = EVP_EncryptFinal_ex(ctx, ciphertext, ciphertext_len);
     if (encrypt_final != 1){
-	handleErrors();
+	    handleErrors();
     }
 
 
@@ -58,21 +55,21 @@ void decryptMessage(EVP_CIPHER_CTX* ctx, const unsigned char* encryptedData, int
     // Call the method from OpenSSL to initialize decryption context with AES-256-CBC. Then call handleErrors()
     int init_decrypt = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aesKey, iv);
     if (init_decrypt != 1){
-	handleErrors();
+	    handleErrors();
     }
 
     int decryptedLen;
     // Call the method from OpenSSL to decrypt the encrypted data. Then call handleErrors()
     int decrypt_text = EVP_DecryptUpdate(ctx, decryptedBuffer, &decryptedLen, encryptedData, encryptedLen);
     if (decrypt_text != 1){
-	handleErrors();
+	    handleErrors();
     }
 
     int finalDecryptedLen;
     // Call the method from OpenSSL to finalize decryption. Then call handleErrors()
     int decrypt_final = EVP_DecryptFinal_ex(ctx, decryptedBuffer + decryptedLen, &finalDecryptedLen);
     if (decrypt_final != 1){
-	handleErrors();
+	    handleErrors();
     }
 
 
