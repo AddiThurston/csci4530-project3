@@ -49,11 +49,29 @@ int main() {
         send(clientSocket, ciphertext, ciphertext_len, 0);
         std::cout << "Sent encrypted message to server." << std::endl;
 
+
+        // Receive new IV and encrypted message from server
+        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        if (!ctx) {
+            std::cerr << "Error: Failed to create AES context." << std::endl;
+        }
+
+        EVP_CIPHER_CTX_init(ctx);
+
         int bytesRead;
-        unsigned char receivedBuffer[BUFFER_SIZE];
-        bytesRead = recv(clientSocket, receivedBuffer, BUFFER_SIZE, 0);
-        receivedBuffer[bytesRead] = '\0';
-        std::cout << "Message received from server: " << receivedBuffer << std::endl;
+        unsigned char receivedMessage[BUFFER_SIZE];
+         unsigned char iv_new[EVP_MAX_IV_LENGTH];
+        bytesRead = recv(clientSocket, iv_new, EVP_MAX_IV_LENGTH, 0);
+        bytesRead = recv(clientSocket, receivedMessage, BUFFER_SIZE, 0);
+
+        unsigned char decryptedBuffer[BUFFER_SIZE];
+        decryptMessage(ctx, receivedMessage, bytesRead, reinterpret_cast<const unsigned char*>(aes_key.c_str()), iv_new, decryptedBuffer);
+        
+        std::cout << "Received encrypted message: ";
+        std::cout.write(reinterpret_cast<const char*>(receivedMessage), bytesRead);
+        std::cout << std::endl;
+
+        std::cout << "Echoed message: " << decryptedBuffer << std::endl;
     }
     close(clientSocket);
 }
