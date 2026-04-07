@@ -48,6 +48,12 @@ int main() {
         send(clientSocket, iv, EVP_MAX_IV_LENGTH, 0);
         send(clientSocket, ciphertext, ciphertext_len, 0);
         std::cout << "Sent encrypted message to server." << std::endl;
+
+        int bytesRead;
+        unsigned char receivedBuffer[BUFFER_SIZE];
+        bytesRead = recv(clientSocket, receivedBuffer, BUFFER_SIZE, 0);
+        receivedBuffer[bytesRead] = '\0';
+        std::cout << "Message received from server: " << receivedBuffer << std::endl;
     }
     close(clientSocket);
 }
