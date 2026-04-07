@@ -26,19 +26,22 @@ void encryptMessage(const std::string& plaintext, unsigned char* ciphertext, int
     }
 
     // Call the method from OpenSSL to initialize encryption operation. Then call the handleErrors() method
+    // it needs a const unsigned char*
     int init_encrypt = EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, reinterpret_cast<const unsigned char*>(aes_key.c_str()), iv);
     if (init_encrypt != 1) {
 	    handleErrors();
     }
 
     // Call the method from OpenSSL to encrypt plaintext. Then call the handleErrors() method
+    // this also needs a const unsigned char*
     int encrypt_text = EVP_EncryptUpdate(ctx, ciphertext, &len, reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length());
     if (encrypt_text != 1) {
 	    handleErrors();
     }
+    *ciphertext_len = len;
 
     // Call the method from OpenSSL to finalize encryption. Then call the handleErrors() method
-    int encrypt_final = EVP_EncryptFinal_ex(ctx, ciphertext, ciphertext_len);
+    int encrypt_final = EVP_EncryptFinal_ex(ctx, ciphertext + len, &len);
     if (encrypt_final != 1){
 	    handleErrors();
     }
